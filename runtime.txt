@@ -1,14 +1,1 @@
-cat > requirements.txt << 'EOF'
-fastapi
-uvicorn
-python-dotenv
-pydantic-settings
-langchain
-langchain-community
-langchain-nvidia-ai-endpoints
-langchain-pinecone
-langchain-text-splitters
-pinecone-client
-pypdf
-python-multipart
-EOF
+python-3.11.0
