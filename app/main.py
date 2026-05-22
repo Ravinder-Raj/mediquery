@@ -2,6 +2,7 @@
 
 # ---------- IMPORTS ----------
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from app.schemas.models import ChatRequest, ChatResponse, UploadResponse
 from app.chains.memory_chain import run_memory_chain
 from app.ingestion.pdf_ingestor import ingest_pdf
@@ -13,6 +14,15 @@ app = FastAPI(
     title="MediQuery API",
     description="Conversational Medical Document Assistant",
     version="1.0.0"
+)
+
+#------------ MIDDLEWARE ------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # We'll restrict this to your frontend URL later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ---------- ROUTES ----------
