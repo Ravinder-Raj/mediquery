@@ -5,7 +5,7 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from app.config import settings
-from app.retriever.chroma_retriever import get_retriever
+from app.retriever.pinecone_retriever import get_retriever
 from app.memory.session_store import get_memory
 
 

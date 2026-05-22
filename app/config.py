@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     embedding_model: str
     collection_name: str
     chroma_path: str
+    pinecone_api_key: str
+    pinecone_index_name: str
 
     model_config = SettingsConfigDict(env_file=".env")
 
