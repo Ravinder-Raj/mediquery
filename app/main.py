@@ -52,53 +52,46 @@ async def root():
 
 
 @app.post("/upload", response_model=UploadResponse)
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(file: UploadFile = File(...), session_id: str = ""):
     file_path = None
-    logger.info(f"Upload request received | filename: {file.filename}")
+    logger.info(f"Upload request received | filename: {file.filename} | session: {session_id}")
     try:
-        # Validate file type
         if not file.filename.endswith(".pdf"):
             logger.warning(f"Invalid file type: {file.filename}")
             raise HTTPException(status_code=400, detail="Only PDF files allowed")
 
-        # Create directory if not exists
+        if not session_id:
+            raise HTTPException(status_code=400, detail="session_id is required")
+
         os.makedirs("data/uploads", exist_ok=True)
 
-        # Save uploaded file temporarily
         file_path = f"data/uploads/{file.filename}"
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         logger.info(f"File saved: {file_path}")
 
-        # Ingest into ChromaDB
-        result = ingest_pdf(file_path)
+        # ✅ pass session_id to ingest
+        result = ingest_pdf(file_path, session_id)
         logger.info(f"Ingestion result: {result}")
 
-        # Delete PDF after ingestion — no longer needed
         os.remove(file_path)
         logger.info(f"Temp file deleted: {file_path}")
 
-        # Extract chunk count from result string
         chunks = int(result.split()[2])
-
         logger.info(f"Upload successful | chunks: {chunks}")
-        return UploadResponse(
-            message="PDF ingested successfully",
-            chunks=chunks
-        )
+
+        return UploadResponse(message="PDF ingested successfully", chunks=chunks)
 
     except HTTPException:
         raise
 
     except Exception as e:
-        # Cleanup temp file on failure too
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
             logger.info(f"Cleaned up file after error: {file_path}")
         logger.error(f"Upload failed: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
-
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
