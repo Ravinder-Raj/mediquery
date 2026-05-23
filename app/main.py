@@ -16,12 +16,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
-#------------ MIDDLEWARE ------------
+# ------------ MIDDLEWARE ------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",   # React/Vite frontend
-        "http://127.0.0.1:3000"
+        "http://localhost:5173",        # Vite dev server
+        "http://127.0.0.1:5173",        # Vite (alternate)
+        "http://localhost:3000",         # React dev server
+        "http://127.0.0.1:3000",        # React (alternate)
+        "https://your-frontend.com",    # 🔁 Replace with your deployed frontend URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -42,6 +45,9 @@ async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files allowed")
 
+    #Create Directory if not exist
+    os.makedirs("data/uploads", exist_ok=True) 
+    
     # Save uploaded file temporarily
     file_path = f"data/uploads/{file.filename}"
     with open(file_path, "wb") as buffer:
